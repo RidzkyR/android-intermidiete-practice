@@ -34,7 +34,7 @@ class MyEditText @JvmOverloads constructor(
                 // Nothing
             }
 
-        }
+        })
     }
 
     override fun onDraw(canvas: Canvas) {
