@@ -3,6 +3,7 @@ package com.example.likesapp
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
@@ -22,6 +23,8 @@ class MainActivity : AppCompatActivity() {
     private val halfOfWidth = (bitmap.width / 2).toFloat()
     private val halfOfHeight = (bitmap.height / 2).toFloat()
 
+    private val message = "Apa Kamu suka Aku?"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -37,9 +40,11 @@ class MainActivity : AppCompatActivity() {
 
         // inisialisai bitmap untuk canvas
         binding.imageView.setImageBitmap(bitmap)
+        showText()
 
         binding.like.setOnClickListener {
             bitmap.eraseColor(0) // menghapus gambar sebelumnya
+            showText()
             showFace()
             showEyes()
             showMouth(true)
@@ -48,6 +53,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.dislike.setOnClickListener {
             bitmap.eraseColor(0) // menghapus gambar sebelumnya
+            showText()
             showFace()
             showEyes()
             showMouth(false)
@@ -122,5 +128,20 @@ class MainActivity : AppCompatActivity() {
                 canvas.drawArc(mouth, 0F, -180F, false, paint)
             }
         }
+    }
+
+    private fun showText() {
+        // warna text
+        val paintText = Paint(Paint.FAKE_BOLD_TEXT_FLAG).apply {
+            textSize = 50F
+            color = ResourcesCompat.getColor(resources, R.color.black, null)
+        }
+
+        val mBounds = Rect()
+        paintText.getTextBounds(message, 0, message.length, mBounds)
+
+        val x: Float = halfOfWidth - mBounds.centerX()
+        val y = 50F
+        canvas.drawText(message, x, y, paintText)
     }
 }
