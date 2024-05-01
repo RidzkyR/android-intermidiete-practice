@@ -22,6 +22,40 @@ class MainActivity : AppCompatActivity() {
     private val halfOfWidth = (bitmap.width / 2).toFloat()
     private val halfOfHeight = (bitmap.height / 2).toFloat()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        enableEdgeToEdge()
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+
+        // inisialisai bitmap untuk canvas
+        binding.imageView.setImageBitmap(bitmap)
+
+        binding.like.setOnClickListener {
+            bitmap.eraseColor(0) // menghapus gambar sebelumnya
+            showFace()
+            showEyes()
+            showMouth(true)
+            binding.imageView.setImageBitmap(bitmap) // panggil ulang tampilan untuk imageView
+        }
+
+        binding.dislike.setOnClickListener {
+            bitmap.eraseColor(0) // menghapus gambar sebelumnya
+            showFace()
+            showEyes()
+            showMouth(false)
+            binding.imageView.setImageBitmap(bitmap) // panggil ulang tampilan untuk imageView
+        }
+
+    }
+
     private fun showFace() {
         val face = RectF(150F, 250F, bitmap.width - 105F, bitmap.height.toFloat() - 50F)
 
@@ -36,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         canvas.drawArc(face, 270F, 180F, false, paint)
     }
 
-    private fun showEye() {
+    private fun showEyes() {
         // hati-hati penulisan baris kode berpengaruh terhadap hasil
 
         // bola mata
@@ -54,43 +88,39 @@ class MainActivity : AppCompatActivity() {
         when (isHappy) {
             true -> {
                 paint.color = ResourcesCompat.getColor(resources, R.color.black, null)
-                val lip = RectF(halfOfWidth - 160F, halfOfHeight - 100F, halfOfWidth + 200F, halfOfHeight + 400F)
+                val lip = RectF(
+                    halfOfWidth - 160F,
+                    halfOfHeight - 100F,
+                    halfOfWidth + 200F,
+                    halfOfHeight + 400F
+                )
                 canvas.drawArc(lip, 25F, 130F, false, paint)
 
                 paint.color = ResourcesCompat.getColor(resources, R.color.white, null)
-                val mouth = RectF(halfOfWidth - 140F, halfOfHeight, halfOfWidth + 180F, halfOfHeight + 380F)
+                val mouth =
+                    RectF(halfOfWidth - 140F, halfOfHeight, halfOfWidth + 180F, halfOfHeight + 380F)
                 canvas.drawArc(mouth, 25F, 130F, false, paint)
             }
-            false ->{
+
+            false -> {
                 paint.color = ResourcesCompat.getColor(resources, R.color.black, null)
-                val lip = RectF(halfOfWidth - 160F, halfOfHeight + 250F, halfOfWidth + 200F, halfOfHeight + 350F)
+                val lip = RectF(
+                    halfOfWidth - 160F,
+                    halfOfHeight + 250F,
+                    halfOfWidth + 200F,
+                    halfOfHeight + 350F
+                )
                 canvas.drawArc(lip, 0F, -180F, false, paint)
 
                 paint.color = ResourcesCompat.getColor(resources, R.color.white, null)
-                val mouth = RectF(halfOfWidth - 140F, halfOfHeight + 260F, halfOfWidth + 180F, halfOfHeight + 330F)
+                val mouth = RectF(
+                    halfOfWidth - 140F,
+                    halfOfHeight + 260F,
+                    halfOfWidth + 180F,
+                    halfOfHeight + 330F
+                )
                 canvas.drawArc(mouth, 0F, -180F, false, paint)
             }
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        enableEdgeToEdge()
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
-        // inisialisai bitmap untuk canvas
-        binding.imageView.setImageBitmap(bitmap)
-
-        showFace()
-        showEye()
-        showMouth(true)
-
     }
 }
