@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "MyWidgets"
 include(":app")
+include(":app")
  

@@ -57,7 +57,7 @@ internal fun updateAppWidget(
     appWidgetManager: AppWidgetManager,
     appWidgetId: Int,
 ) {
-    //konfigurasi aksi ketika button di klik
+    //konfigurasi pending Intent
     val intent = Intent(context, RandomNumberWidget::class.java)
     intent.action = RandomNumberWidget.WIDGET_CLICK
     intent.putExtra(RandomNumberWidget.WIDGET_ID_EXTRA, appWidgetId)
