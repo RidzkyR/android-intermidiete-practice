@@ -19,10 +19,12 @@ import androidx.core.util.Pair
  * Created by sidiqpermana on 10/28/16.
  */
 
-class ListHeroAdapter(private val listHero: ArrayList<Hero>) : RecyclerView.Adapter<ListHeroAdapter.ListViewHolder>() {
+class ListHeroAdapter(private val listHero: ArrayList<Hero>) :
+    RecyclerView.Adapter<ListHeroAdapter.ListViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
-        val view: View = LayoutInflater.from(parent.context).inflate(R.layout.item_row_hero, parent, false)
+        val view: View =
+            LayoutInflater.from(parent.context).inflate(R.layout.item_row_hero, parent, false)
         return ListViewHolder(view)
     }
 
@@ -48,7 +50,15 @@ class ListHeroAdapter(private val listHero: ArrayList<Hero>) : RecyclerView.Adap
             itemView.setOnClickListener {
                 val intent = Intent(itemView.context, HeroActivity::class.java)
                 intent.putExtra("Hero", hero)
-                itemView.context.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(itemView.context as Activity).toBundle())
+
+                val optionsCompat: ActivityOptionsCompat =
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        itemView.context as Activity,
+                        Pair(imgPhoto, "profile")
+                    )
+
+                // itemView.context.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(itemView.context as Activity).toBundle())
+                itemView.context.startActivity(intent,optionsCompat.toBundle()) // diubah karena parameter sudah di inisialisasi
             }
         }
     }
