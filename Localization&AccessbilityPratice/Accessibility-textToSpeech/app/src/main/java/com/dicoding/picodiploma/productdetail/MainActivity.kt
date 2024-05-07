@@ -61,6 +61,25 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
+        setupAccesibility(product)
+    }
+
+    //menambahakan deskripsi pada komponen
+    private fun setupAccesibility(product: ProductModel) {
+        product.apply {
+            binding.apply {
+                settingImageView.contentDescription = getString(R.string.settingDescription)
+                previewImageView.contentDescription = getString(R.string.previewDescription)
+                colorTextView.contentDescription = getString(R.string.colorDescription, color)
+                sizeTextView.contentDescription = getString(R.string.sizeDescription, size)
+                ratingTextView.contentDescription = getString(
+                    R.string.ratingDescription,
+                    rating.withNumberingFormat(),
+                    countRating.withNumberingFormat()
+                )
+                storeTextView.contentDescription = getString(R.string.storeDescription, store)
+            }
+        }
     }
 
 }
