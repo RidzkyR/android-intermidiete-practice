@@ -3,6 +3,7 @@ package com.dicoding.picodiploma.productdetail.data
 import android.content.Context
 import com.dicoding.picodiploma.productdetail.R
 
+// disini seakan-akan mengambil data dari api
 class RemoteDataSource(private val context: Context) {
     fun getDetailProduct(): ProductModel {
         return ProductModel(

@@ -49,7 +49,8 @@ class ImageBannerWidget : AppWidgetProvider() {
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
     }
-
+    
+    // proses broadcast ketika salah satu widget ditekan.
     override fun onReceive(context: Context?, intent: Intent?) {
         super.onReceive(context, intent)
         if (intent?.action != TOAST_ACTION) {
