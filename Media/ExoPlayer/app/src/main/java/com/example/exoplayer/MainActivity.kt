@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
 
         val exoPlayer = ExoPlayer.Builder(this).build().also {
             it.setMediaItem(videoItem)
-            it.setMediaItem(audioItem)
+            it.setMediaItem(audioItemq)
             it.prepare()
         }
 
