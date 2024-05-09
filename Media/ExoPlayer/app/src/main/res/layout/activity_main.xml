@@ -12,13 +12,13 @@
         android:id="@+id/player_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:default_artwork="@drawable/bg"
-        app:use_artwork="true"
-        app:resize_mode="fixed_width"
-        app:show_buffering="when_playing"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:default_artwork="@drawable/bg"
+        app:use_artwork="true"
+        app:resize_mode="fixed_width"
+        app:show_buffering="when_playing"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
