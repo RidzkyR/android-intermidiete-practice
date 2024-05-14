@@ -57,4 +57,7 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.lifecycle.runtime.ktx) //untuk lifecycleScope
     implementation(libs.androidx.exifinterface)
+
+    implementation(libs.androidx.lifecycle.viewmodel.ktx) //viewModelScope
+    implementation(libs.androidx.lifecycle.livedata.ktx) //liveData
 }

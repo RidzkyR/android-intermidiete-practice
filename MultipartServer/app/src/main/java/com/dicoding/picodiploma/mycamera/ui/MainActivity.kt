@@ -1,4 +1,4 @@
-package com.dicoding.picodiploma.mycamera
+package com.dicoding.picodiploma.mycamera.ui
 
 import android.Manifest
 import android.content.Intent
@@ -10,27 +10,26 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import androidx.lifecycle.lifecycleScope
-import com.dicoding.picodiploma.mycamera.CameraActivity.Companion.CAMERAX_RESULT
-import com.dicoding.picodiploma.mycamera.data.api.ApiConfig
-import com.dicoding.picodiploma.mycamera.data.api.FileUploadResponse
+import androidx.lifecycle.ViewModelProvider
+import com.dicoding.picodiploma.mycamera.R
+import com.dicoding.picodiploma.mycamera.data.ResultState
+import com.dicoding.picodiploma.mycamera.ui.CameraActivity.Companion.CAMERAX_RESULT
 import com.dicoding.picodiploma.mycamera.databinding.ActivityMainBinding
-import com.google.gson.Gson
-import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import retrofit2.HttpException
+import com.dicoding.picodiploma.mycamera.getImageUri
+import com.dicoding.picodiploma.mycamera.reduceFileImage
+import com.dicoding.picodiploma.mycamera.uriToFile
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
     private var currentImageUri: Uri? = null
+    private val viewModel by viewModels<MainViewModel> {
+        ViewModelFactory.getInstance()
+    }
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
@@ -111,31 +110,52 @@ class MainActivity : AppCompatActivity() {
             val imageFile = uriToFile(uri, this).reduceFileImage() // menguragi size image
             val description = "lorem Ipsum Tes Deskripsi"
             Log.d("imageFile","showImage: ${imageFile.path}")
-            showLoading(true)
 
-            //RequestBody
-            val requestBody = description.toRequestBody("text/plain".toMediaType())
-            val requestImageFile = imageFile.asRequestBody("image/jpeg".toMediaType())
-            val multipartBody = MultipartBody.Part.createFormData(
-                "photo",
-                imageFile.name,
-                requestImageFile
-            )
+//            showLoading(true)
+//            //RequestBody
+//            val requestBody = description.toRequestBody("text/plain".toMediaType())
+//            val requestImageFile = imageFile.asRequestBody("image/jpeg".toMediaType())
+//            val multipartBody = MultipartBody.Part.createFormData(
+//                "photo",
+//                imageFile.name,
+//                requestImageFile
+//            )
+//
+//            //mengirim ke server
+//            lifecycleScope.launch {
+//                try {
+//                    val apiService = ApiConfig.getApiService()
+//                    val successResponse = apiService.uploadImage(multipartBody,requestBody)
+//                    showToast(successResponse.message)
+//                    showLoading(false)
+//                }catch (e: HttpException){
+//                    val erroBody = e.response()?.errorBody()?.string()
+//                    val errorResponse = Gson().fromJson(erroBody, FileUploadResponse::class.java)
+//                    showToast(errorResponse.message)
+//                    showLoading(false)
+//                }
+//            }
 
-            //mengirim ke server
-            lifecycleScope.launch {
-                try {
-                    val apiService = ApiConfig.getApiService()
-                    val successResponse = apiService.uploadImage(multipartBody,requestBody)
-                    showToast(successResponse.message)
-                    showLoading(false)
-                }catch (e: HttpException){
-                    val erroBody = e.response()?.errorBody()?.string()
-                    val errorResponse = Gson().fromJson(erroBody, FileUploadResponse::class.java)
-                    showToast(errorResponse.message)
-                    showLoading(false)
+            viewModel.uploadImage(imageFile, description).observe(this) { result ->
+                if (result != null) {
+                    when (result) {
+                        is ResultState.Loading -> {
+                            showLoading(true)
+                        }
+
+                        is ResultState.Success -> {
+                            showToast(result.data.message)
+                            showLoading(false)
+                        }
+
+                        is ResultState.Error -> {
+                            showToast(result.error)
+                            showLoading(false)
+                        }
+                    }
                 }
             }
+
         }?: showToast(getString(R.string.empty_image_warning))
     }
 
