@@ -6,14 +6,25 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.lifecycle.lifecycleScope
 import com.dicoding.picodiploma.mycamera.CameraActivity.Companion.CAMERAX_RESULT
+import com.dicoding.picodiploma.mycamera.data.api.ApiConfig
+import com.dicoding.picodiploma.mycamera.data.api.FileUploadResponse
 import com.dicoding.picodiploma.mycamera.databinding.ActivityMainBinding
+import com.google.gson.Gson
+import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.HttpException
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,9 +33,7 @@ class MainActivity : AppCompatActivity() {
     private var currentImageUri: Uri? = null
 
     private val requestPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
                 Toast.makeText(this, "Permission request granted", Toast.LENGTH_LONG).show()
             } else {
@@ -32,11 +41,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-    private fun allPermissionsGranted() =
-        ContextCompat.checkSelfPermission(
-            this,
-            REQUIRED_PERMISSION
-        ) == PackageManager.PERMISSION_GRANTED
+    private fun allPermissionsGranted() = ContextCompat.checkSelfPermission(this, REQUIRED_PERMISSION) == PackageManager.PERMISSION_GRANTED
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,9 +62,8 @@ class MainActivity : AppCompatActivity() {
         launcherGallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
-    private val launcherGallery = registerForActivityResult(
-        ActivityResultContracts.PickVisualMedia()
-    ) { uri: Uri? ->
+    private val launcherGallery =
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
         if (uri != null) {
             currentImageUri = uri
             showImage()
@@ -103,7 +107,44 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun uploadImage() {
-        Toast.makeText(this, "Fitur ini belum tersedia", Toast.LENGTH_SHORT).show()
+        currentImageUri?.let { uri ->
+            val imageFile = uriToFile(uri, this).reduceFileImage() // menguragi size image
+            val description = "lorem Ipsum Tes Deskripsi"
+            Log.d("imageFile","showImage: ${imageFile.path}")
+            showLoading(true)
+
+            //RequestBody
+            val requestBody = description.toRequestBody("text/plain".toMediaType())
+            val requestImageFile = imageFile.asRequestBody("image/jpeg".toMediaType())
+            val multipartBody = MultipartBody.Part.createFormData(
+                "photo",
+                imageFile.name,
+                requestImageFile
+            )
+
+            //mengirim ke server
+            lifecycleScope.launch {
+                try {
+                    val apiService = ApiConfig.getApiService()
+                    val successResponse = apiService.uploadImage(multipartBody,requestBody)
+                    showToast(successResponse.message)
+                    showLoading(false)
+                }catch (e: HttpException){
+                    val erroBody = e.response()?.errorBody()?.string()
+                    val errorResponse = Gson().fromJson(erroBody, FileUploadResponse::class.java)
+                    showToast(errorResponse.message)
+                    showLoading(false)
+                }
+            }
+        }?: showToast(getString(R.string.empty_image_warning))
+    }
+
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.progressIndicator.visibility = if (!isLoading) View.GONE else View.VISIBLE
+    }
+    private fun showToast(message: String) {
+        Toast.makeText(this,message,Toast.LENGTH_SHORT).show()
     }
 
     companion object {

@@ -1,6 +1,8 @@
 package com.dicoding.picodiploma.mycamera
 
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -17,6 +19,9 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import com.dicoding.picodiploma.mycamera.databinding.ActivityCameraBinding
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
 
 class CameraActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCameraBinding
