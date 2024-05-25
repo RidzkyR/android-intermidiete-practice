@@ -1,4 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">RunningApp</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="start_running">Start Running</string>
+    <string name="stop_running">Stop Running</string>
+    <string name="start_point">Start Point</string>
 </resources>
