@@ -1,9 +1,17 @@
 package com.example.googlemaps
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.DrawableCompat
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -12,6 +20,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.googlemaps.databinding.ActivityMapsBinding
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -43,14 +53,40 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        // val sydney = LatLng(-34.0, 151.0)
+        // mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+        // mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+
+        //new marker
+        val dicoding = LatLng(-6.8957643, 107.6338462)
+        mMap.addMarker(MarkerOptions().position(dicoding).title("Kantor Dicoding nih"))
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(dicoding, 15f)) // mengarahkan kamera ke lokasi dengan zoom level 15
 
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.uiSettings.isIndoorLevelPickerEnabled = true
         mMap.uiSettings.isCompassEnabled = true
         mMap.uiSettings.isMapToolbarEnabled = true
+
+        //membuat marker baru
+        mMap.setOnMapLongClickListener { latLng ->
+            mMap.addMarker(
+                MarkerOptions()
+                    .position(latLng)
+                    .title("New Marker")
+                    .snippet("Lat: ${latLng.latitude} Long: ${latLng.longitude}")
+                    .icon(vectorToBitmap(R.drawable.ic_custom_mark, Color.parseColor("#3DDC84")))
+            )
+        }
+
+        mMap.setOnPoiClickListener { pointOfInterest ->
+            val poiMarker = mMap.addMarker(
+                MarkerOptions()
+                    .position(pointOfInterest.latLng)
+                    .title(pointOfInterest.name)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+            )
+            poiMarker?.showInfoWindow()
+        }
     }
 
     // menampilkan menu
@@ -86,5 +122,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 super.onOptionsItemSelected(item)
             }
         }
+    }
+
+    //mengubah vector menjadi bitmap
+    private fun vectorToBitmap(@DrawableRes id: Int, @ColorInt color: Int): BitmapDescriptor {
+        val vector = ResourcesCompat.getDrawable(resources, id, null)
+        if (vector == null) {
+            Log.e("BitmapHelper", "Resource not found")
+            return BitmapDescriptorFactory.defaultMarker()
+        }
+        val bitmap = Bitmap.createBitmap(
+            vector.intrinsicWidth,
+            vector.intrinsicHeight,
+            Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(bitmap)
+        vector.setBounds(0, 0, canvas.width, canvas.height)
+        DrawableCompat.setTint(vector, color)
+        vector.draw(canvas)
+        return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
 }
