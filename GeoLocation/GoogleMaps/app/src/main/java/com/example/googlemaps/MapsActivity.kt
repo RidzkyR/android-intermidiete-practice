@@ -1,6 +1,7 @@
 package com.example.googlemaps
 
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -25,6 +26,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.example.googlemaps.databinding.ActivityMapsBinding
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.MapStyleOptions
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -85,6 +87,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
         getMylocation() // menampilkan lokasi user
+        getMapsStyle() // mendapatkan style maps dari styling wizard
+    }
+
+    private fun getMapsStyle() {
+        try {
+            val success = mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.maps_style))
+            if (!success){
+                Log.e("MAPS STYLE","Style parsing failed")
+            }
+        }catch (e: Resources.NotFoundException){
+                Log.e("MAPS STYLE","Can't find style, error: ", e)
+        }
     }
 
     // cek izin
