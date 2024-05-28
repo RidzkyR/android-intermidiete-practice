@@ -72,4 +72,11 @@ dependencies {
 
     //desugaring (menggunakan fitur Java 8 pada versi di bawah Android O)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+    //mockito
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
+
+    //special testing
+    testImplementation(libs.androidx.core.testing) // InstantTaskExecutorRule
 }
