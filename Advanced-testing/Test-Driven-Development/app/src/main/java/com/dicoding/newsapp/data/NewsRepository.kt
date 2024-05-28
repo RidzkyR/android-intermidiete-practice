@@ -8,10 +8,7 @@ import com.dicoding.newsapp.data.local.entity.NewsEntity
 import com.dicoding.newsapp.data.local.room.NewsDao
 import com.dicoding.newsapp.data.remote.retrofit.ApiService
 
-class NewsRepository(
-    private val apiService: ApiService,
-    private val newsDao: NewsDao
-) {
+class NewsRepository(private val apiService: ApiService, private val newsDao: NewsDao) {
     fun getHeadlineNews(): LiveData<Result<List<NewsEntity>>> = liveData {
         emit(Result.Loading)
         try {
