@@ -13,12 +13,13 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import com.dicoding.newsapp.data.Result
+import com.dicoding.newsapp.utils.getOrAwaitValue
 import org.junit.Rule
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 
 @RunWith(MockitoJUnitRunner::class)
-class NewsViewModelTest{
+class NewsViewModelTest {
 
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
@@ -29,24 +30,32 @@ class NewsViewModelTest{
     private val dummyNews = DataDummy.generateDummyNewsEntity()
 
     @Before
-    fun setup(){
+    fun setup() {
         newsViewModel = NewsViewModel(newsRepository)
     }
 
     @Test
     fun `when Get HeadlineNews Should Not Null and Return Success`() {
-        val observer = Observer<Result<List<NewsEntity>>> {}
-        try {
-            val expectedNews = MutableLiveData<Result<List<NewsEntity>>>()
-            expectedNews.value = Result.Success(dummyNews)
-            `when`(newsRepository.getHeadlineNews()).thenReturn(expectedNews)
+        val expectedNews = MutableLiveData<Result<List<NewsEntity>>>()
+        expectedNews.value = Result.Success(dummyNews)
 
-            val actualNews = newsViewModel.getHeadlineNews().observeForever(observer)
+        `when`(newsRepository.getHeadlineNews()).thenReturn(expectedNews)
 
-            Mockito.verify(newsRepository).getHeadlineNews()
-            assertNotNull(actualNews)
-        } finally {
-            newsViewModel.getHeadlineNews().removeObserver(observer)
-        }
+        val actualNews = newsViewModel.getHeadlineNews().getOrAwaitValue()
+        Mockito.verify(newsRepository).getHeadlineNews()
+        assertNotNull(actualNews)
+        assertTrue(actualNews is Result.Success)
+        assertEquals(dummyNews.size, (actualNews as Result.Success).data.size)
+    }
+
+    @Test
+    fun `when Network Error Should Return Error`() {
+        val headlineNews = MutableLiveData<Result<List<NewsEntity>>>()
+        headlineNews.value = Result.Error("Error")
+        `when`(newsRepository.getHeadlineNews()).thenReturn(headlineNews)
+        val actualNews = newsViewModel.getHeadlineNews().getOrAwaitValue()
+        Mockito.verify(newsRepository).getHeadlineNews()
+        assertNotNull(actualNews)
+        assertTrue(actualNews is Result.Error)
     }
 }
