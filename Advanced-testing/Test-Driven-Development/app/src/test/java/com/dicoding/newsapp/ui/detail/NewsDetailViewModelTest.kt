@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.dicoding.newsapp.data.NewsRepository
 import com.dicoding.newsapp.utils.DataDummy
+import com.dicoding.newsapp.utils.MainDispatcherRule
 import com.dicoding.newsapp.utils.getOrAwaitValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -40,13 +41,8 @@ class NewsDetailViewModelTest{
         newsDetailViewModel.setNewsData(dummyDetailNews)
     }
 
-    private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
-
-    @Before
-    fun setupDispatcher() = Dispatchers.setMain(testDispatcher)
-
-    @After
-    fun tearDownDispatcher() = Dispatchers.resetMain()
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
 
     @Test
     fun `when bookmarkStatus false Should call saveNews`() = runTest {
@@ -56,6 +52,19 @@ class NewsDetailViewModelTest{
         `when`(newsRepository.isNewsBookmarked(dummyDetailNews.title)).thenReturn(expectedBoolean)
         newsDetailViewModel.bookmarkStatus.getOrAwaitValue()
         newsDetailViewModel.changeBookmark(dummyDetailNews)
+
         Mockito.verify(newsRepository).saveNews(dummyDetailNews)
+    }
+
+    @Test
+    fun `when bookmarkStatus true Should call deleteNews`() = runTest {
+        val expectedBoolean = MutableLiveData<Boolean>()
+        expectedBoolean.value = true
+
+        `when`(newsRepository.isNewsBookmarked(dummyDetailNews.title)).thenReturn(expectedBoolean)
+        newsDetailViewModel.bookmarkStatus.getOrAwaitValue()
+        newsDetailViewModel.changeBookmark(dummyDetailNews)
+
+        Mockito.verify(newsRepository).deleteNews(dummyDetailNews.title)
     }
 }
