@@ -36,6 +36,11 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+
+    @Suppress("UnstableApiUsage")
+    testOptions{
+        animationsDisabled = true
+    }
 }
 
 dependencies {
@@ -86,4 +91,15 @@ dependencies {
     //special instrumentation testing
     androidTestImplementation(libs.androidx.core.testing) // InstantTaskExecutorRule
     androidTestImplementation(libs.kotlinx.coroutines.test) //TestDispatcher
+
+    //TestCoroutineDispatcher
+    debugImplementation(libs.androidx.fragment.testing) //launchFragmentInContainer
+
+    //mock web server
+    androidTestImplementation(libs.mockwebserver)
+    androidTestImplementation(libs.okhttp3.okhttp.tls)
+
+    androidTestImplementation(libs.espresso.contrib) //RecyclerViewActions / aksi scroll
+
+    implementation(libs.androidx.espresso.idling.resource) // menunggu proses pengecekan sampai data yang ditampilkan siap. Sehingga pengujian menjadi lebih reliable.
 }

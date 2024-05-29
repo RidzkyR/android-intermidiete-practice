@@ -7,25 +7,28 @@ import com.dicoding.newsapp.BuildConfig
 import com.dicoding.newsapp.data.local.entity.NewsEntity
 import com.dicoding.newsapp.data.local.room.NewsDao
 import com.dicoding.newsapp.data.remote.retrofit.ApiService
+import com.dicoding.newsapp.utils.wrapEspressoIdlingResource
 
 class NewsRepository(private val apiService: ApiService, private val newsDao: NewsDao) {
     fun getHeadlineNews(): LiveData<Result<List<NewsEntity>>> = liveData {
         emit(Result.Loading)
-        try {
-            val response = apiService.getNews(BuildConfig.API_KEY)
-            val articles = response.articles
-            val newsList = articles.map { article ->
-                NewsEntity(
-                    article.title,
-                    article.publishedAt,
-                    article.urlToImage,
-                    article.url
-                )
+        wrapEspressoIdlingResource {
+            try {
+                val response = apiService.getNews(BuildConfig.API_KEY)
+                val articles = response.articles
+                val newsList = articles.map { article ->
+                    NewsEntity(
+                        article.title,
+                        article.publishedAt,
+                        article.urlToImage,
+                        article.url
+                    )
+                }
+                emit(Result.Success(newsList))
+            } catch (e: Exception) {
+                Log.d("NewsRepository", "getHeadlineNews: ${e.message.toString()} ")
+                emit(Result.Error(e.message.toString()))
             }
-            emit(Result.Success(newsList))
-        } catch (e: Exception) {
-            Log.d("NewsRepository", "getHeadlineNews: ${e.message.toString()} ")
-            emit(Result.Error(e.message.toString()))
         }
     }
 
